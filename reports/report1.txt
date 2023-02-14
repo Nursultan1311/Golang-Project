@@ -14,5 +14,4 @@ Mysql server was connected by Nurs.
 
 Note: You need to restart everytime after changing the code
 
-Report 2.
-We could add user form. We can add a new user to database.  
+
