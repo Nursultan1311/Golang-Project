@@ -1,64 +1,101 @@
 package main
 
-import (
-  "database/sql"
+import "database/sql"
+import _ "github.com/go-sql-driver/mysql"
 
-  "fmt"
+import "golang.org/x/crypto/bcrypt"
 
-  "net/http"
+import "net/http"
 
-  "html/template"
+var db *sql.DB
+var err error
 
-  _ "github.com/go-sql-driver/mysql"
-)
+func signupPage(res http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		http.ServeFile(res, req, "templates/signup.html")
+		return
+	}
 
-var tpl *template.Template
+	username := req.FormValue("username")
+	password := req.FormValue("password")
+	email := req.FormValue("email")
+	name := req.FormValue("name")
 
-type User struct {
-  id       int
-  fullname string
-  email    string
-  phone    string
+	var user string
+
+	err := db.QueryRow("SELECT username FROM users WHERE username=?", username).Scan(&user)
+
+	switch {
+	case err == sql.ErrNoRows:
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			http.Error(res, "Server error, unable to create your account.", 500)
+			return
+		}
+
+		_, err = db.Exec("INSERT INTO users(username, password, email, name) VALUES(?, ?, ?, ?)", username, hashedPassword, email, name)
+		if err != nil {
+			http.Error(res, "Server error, unable to create your account.", 500)
+			return
+		}
+
+		res.Write([]byte("User created!"))
+		return
+	case err != nil:
+		http.Error(res, "Server error, unable to create your account.", 500)
+		return
+	default:
+		http.Redirect(res, req, "/", 301)
+	}
 }
 
-// When we run the main.go file firstly we call main method
+func loginPage(res http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		http.ServeFile(res, req, "templates/login.html")
+		return
+	}
+
+	username := req.FormValue("username")
+	password := req.FormValue("password")
+
+	var databaseusername string
+	var databasePassword string
+
+	err := db.QueryRow("SELECT username, password FROM users WHERE username=?", username).Scan(&databaseusername, &databasePassword)
+
+	if err != nil {
+		http.Redirect(res, req, "/login", 301)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(databasePassword), []byte(password))
+	if err != nil {
+		http.Redirect(res, req, "/login", 301)
+		return
+	}
+
+	res.Write([]byte("Hello " + databaseusername))
+
+}
+
+func homePage(res http.ResponseWriter, req *http.Request) {
+	http.ServeFile(res, req, "templates/index.html")
+}
+
 func main() {
-  tpl, _ = template.ParseGlob("templates/*.html")
-  handleRequest() // we call another method named "handleRequest"
-}
+	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/go")
+	if err != nil {
+		panic(err.Error())
+	}
+	defer db.Close()
 
-// this method checks all requests from the website
-func handleRequest() {
-  http.HandleFunc("/add_user", addUser)      // if domain name will extend like "localhost:8080/home_page" then we call homePage method
-  http.ListenAndServe("localhost:8080", nil) //  this is main domain name
-}
+	err = db.Ping()
+	if err != nil {
+		panic(err.Error())
+	}
 
-// this method has two parameters. ResponseWriter for adding html file to http, and second one for getting a request
-func addUser(w http.ResponseWriter, r *http.Request) {
-    // if r.Method == "POST" {
-    tpl.ExecuteTemplate(w, "add_user.html", nil) // here we are writing add_user.html file with by Template
-    // }
-
-    r.ParseForm()
-    surname := r.FormValue("surname")
-    name := r.FormValue("name")
-    email := r.FormValue("email")
-    password := r.FormValue("password")
-
-    db, err := sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/golang")
-    if err != nil {
-      panic(err)
-    }
-    defer db.Close()
-
-    insert, err := db.Query(fmt.Sprintf("INSERT INTO `users`(`name`, `surname`, `email`, `password`) VALUES ('%s', '%s', '%s', '%s')", name, surname, email, password))
-    if err != nil {
-      panic(err.Error())
-    }
-    defer insert.Close()
-
-    fmt.Println("User was succesfully inserted")
-
-    return
-
+	http.HandleFunc("/signup", signupPage)
+	http.HandleFunc("/login", loginPage)
+	http.HandleFunc("/", homePage)
+	http.ListenAndServe(":8080", nil)
 }
