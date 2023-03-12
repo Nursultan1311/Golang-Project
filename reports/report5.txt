@@ -5,4 +5,4 @@ To do this, we created a new table in the database called "Products".
 In the controllers folder there is a ProductController file, there we created a function for adding which is called "addProduct". 
 And after adding a new product, it will show the result in templates/add_product.html where we gave the path to this html page.
 
-Second 
+Second we change authentication, so now we add jwt token to cookies and it work as real authentication.
