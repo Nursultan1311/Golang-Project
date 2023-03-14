@@ -6,3 +6,5 @@ type Product struct {
 	Price       int
 	Quantity    int
 }
+
+// you need to create Products table with above parameters, additionally you can add id
