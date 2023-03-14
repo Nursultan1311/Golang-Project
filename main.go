@@ -8,7 +8,7 @@ import (
 )
 
 var tpl *template.Template
-
+// Here we call the functions for different links
 func main() {
 	tpl, _ = tpl.ParseGlob("templates/*.html")
 
