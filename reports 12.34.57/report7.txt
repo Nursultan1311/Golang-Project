@@ -1,0 +1,5 @@
+Report No.7
+
+We create new project without frontend. Because we have many problems with html files. So we decide to continue without front.
+We add MVC to our project, but without view. I think till final we'll fix problems with view and front. Now we finish filtering
+books by his price between to prices. We finish CRUD of book models. 

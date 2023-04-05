@@ -1,0 +1,8 @@
+Report 5
+
+Firstly we did adding a new product from website to database :
+Create new table "table and connecting with them.
+Then getting data from form and inserting a new data to database.
+At the end we will send redirecting the page.
+
+Second we change authentication, so now we add jwt token to cookies and it work as real authentication.
