@@ -1,0 +1,9 @@
+Report 8
+
+This week to our project was added filtering by book rating and user can give additional rating for books.
+Book rating will be changed every time when user give a rating
+
+Filter by rating: you send the rating for backend, so we get all books which rating higher or equal to target rating.
+Give a rating: Only user which was registered can give rating for books.
+So when you send the request you need add email and password.
+We take the email and check for existing this user then compare the password, only then we give rating for target book.
