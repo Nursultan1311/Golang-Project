@@ -4,7 +4,6 @@ import (
 	"Test2/initializers"
 	"Test2/pkg/models"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
@@ -82,6 +81,7 @@ func EditBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"Edit": "Book successfully edited",
 	})
+
 }
 
 func DeleteBook(c *gin.Context) {
@@ -114,7 +114,7 @@ func PriceFiltering(c *gin.Context) {
 func RatingFiltering(c *gin.Context) {
 	rating := c.Query("rating")
 	var books []models.Book
-	result := initializers.GetDB().Where("rating >= ?", rating).Order("rating").Find(&books)
+	result := initializers.GetDB().Where("rating >= ?", rating).Order("rating desc").Find(&books)
 
 	if result.Error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -130,10 +130,8 @@ func RatingFiltering(c *gin.Context) {
 
 func GiveRating(c *gin.Context) {
 	var body struct {
-		Email     string
-		Password  string
-		Book_name string
-		Rating    float32
+		Title  string
+		Rating float32
 	}
 
 	if c.Bind(&body) != nil {
@@ -143,25 +141,8 @@ func GiveRating(c *gin.Context) {
 		return
 	}
 
-	user := models.User{}
-	initializers.GetDB().First(&user, "email = ?", body.Email)
-
-	if user.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Wrong gmail or password",
-		})
-		return
-	}
-
-	if err := bcrypt.CompareHashAndPassword(user.Password, []byte(body.Password)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Wrong password. Try again",
-		})
-		return
-	}
-
 	var target models.Book
-	initializers.GetDB().Find(&target, "title=?", body.Book_name)
+	initializers.GetDB().Find(&target, "title=?", body.Title)
 	avg := (body.Rating + target.Rating) / 2
 	if body.Rating <= 5.0 {
 		initializers.GetDB().Model(&target).Update("Rating", avg)

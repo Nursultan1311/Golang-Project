@@ -1,8 +1,10 @@
 package models
 
+import "gorm.io/gorm"
+
 type Comment struct {
-	Id     string `json:"id"`
-	Author int8
+	gorm.Model
+	Author string
 	Title  string `json:"title"`
-	Book   int8
+	Book   string
 }

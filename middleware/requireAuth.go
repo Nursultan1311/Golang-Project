@@ -33,7 +33,7 @@ func RequireAuth(c *gin.Context) {
 		if user.ID == 0 {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
-		c.Set("user", user)
+		c.Set("user", user.Email)
 		c.Next()
 	} else {
 		c.AbortWithStatus(http.StatusUnauthorized)

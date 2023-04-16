@@ -1,0 +1,4 @@
+Report 9:
+In this report we add commenting system to our projet.
+Comment model include gorm.
+id title of comment, author email and book name.

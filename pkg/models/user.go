@@ -7,6 +7,6 @@ type User struct {
 	Name     string `json:"name"`
 	Username string `gorm:"unique"`
 	Email    string `gorm:"unique"`
-	Type     int8   `json:"category"`
+	Type     string `json:"category"`
 	Password []byte
 }
