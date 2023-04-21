@@ -1,0 +1,4 @@
+Report 10
+
+In this report we have given users their role: admin, customer, seller
+Admin and seller cannot put a rating on the products, only  customer can.
