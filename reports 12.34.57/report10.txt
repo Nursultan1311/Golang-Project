@@ -1,4 +1,6 @@
 Report 10
 
-In this report we have given users their role: admin, customer, seller
-Admin and seller cannot put a rating on the products, only  customer can.
+In this report we have given users their role: admin, client, seller
+Admin and seller cannot put a rating on the products, only client can.
+Seller can add new books, update and delete the books. Admin also can do it.
+Leave a comment may only the clients. Delete it can only his owners.
